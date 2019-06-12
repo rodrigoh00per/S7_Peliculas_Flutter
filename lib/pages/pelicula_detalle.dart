@@ -25,7 +25,9 @@ class PeliculaDetalle extends StatelessWidget {
               ),
               this._posterTitulo(context, pelicula),
               this._descripcion(pelicula),
-              this._descripcion(pelicula),
+              SizedBox(
+                height: 10.0,
+              ),
               this._crearCasting(pelicula)
             ]),
           )

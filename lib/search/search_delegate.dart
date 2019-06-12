@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:s7_peliculas/models/pelicula_model.dart';
 import 'package:s7_peliculas/providers/pelicula_provider.dart';
+import 'package:flutter/services.dart';
 
 class DataSearch extends SearchDelegate {
   final _peliculasProvider = PeliculasProvider();
@@ -14,6 +15,8 @@ class DataSearch extends SearchDelegate {
     "Superman"
   ];
   List listaSugerencias = ["Spiderman", "Capitan America"];
+
+  List<Pelicula> _listaPeliculasSugerencia = List();
   @override
   List<Widget> buildActions(BuildContext context) {
     // Las acciones de nuestro appbar (como cerrar o cancelar)
@@ -46,43 +49,86 @@ class DataSearch extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     // Crea los resultados que vamos a mostrar
-    return Container();
+
+    return ListView.builder(
+      itemCount: this._listaPeliculasSugerencia.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ListTile(
+          onTap: () {
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+            close(context, null);
+            this._listaPeliculasSugerencia[index].idTarjeta = '';
+
+            Navigator.pushNamed(context, 'peliculaDetalle',
+                arguments: {"pelicula": this._listaPeliculasSugerencia[index]});
+          },
+          leading: FadeInImage(
+            height: 50.0,
+            placeholder: AssetImage("assets/img/no-image.jpg"),
+            image:
+                NetworkImage(this._listaPeliculasSugerencia[index].getImage()),
+          ),
+          title: Text(this._listaPeliculasSugerencia[index].title),
+          subtitle: Text(this._listaPeliculasSugerencia[index].originalTitle),
+        );
+      },
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     //query es valor a busqueda
-    return FutureBuilder(
-      future: this._peliculasProvider.buscarPelicula(query),
-      builder: (BuildContext context, AsyncSnapshot<List<Pelicula>> snapshot) {
-        if (snapshot.hasData) {
-          final peliculas = snapshot.data;
 
-          return ListView(
-              scrollDirection: Axis.vertical,
-              children: peliculas.map((pelicula) {
-                return ListTile(
-                  leading: FadeInImage(
-                    image: NetworkImage(pelicula.getImage()),
-                    placeholder: AssetImage('assets/img/no-image.jpg'),
-                    width: 50.0,
-                    fit: BoxFit.contain,
-                  ),
-                  title: Text(pelicula.title),
-                  subtitle: Text(pelicula.originalTitle),
-                  onTap: () {
-                    close(context, null);
-                    pelicula.idTarjeta = '';
-                    Navigator.pushNamed(context, 'peliculaDetalle',
-                        arguments: {"pelicula": pelicula});
-                  },
-                );
-              }).toList());
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+    if (query.isEmpty) {
+      return Container();
+    } else {
+      Widget peliculaLista = Flex(
+        direction: Axis.vertical,
+        children: <Widget>[
+          Expanded(
+            child: FutureBuilder(
+              future: this._peliculasProvider.buscarPelicula(query),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Pelicula>> snapshot) {
+                if (snapshot.hasData) {
+                  final peliculas = snapshot.data;
+                  this._listaPeliculasSugerencia = peliculas;
+
+                  return ListView.builder(
+                    itemCount: peliculas.length,
+                    itemBuilder: (BuildContext context, i) {
+                      return ListTile(
+                        leading: FadeInImage(
+                          height: 50.0,
+                          image: NetworkImage(peliculas[i].getImage()),
+                          placeholder: AssetImage('assets/img/no-image.jpg'),
+                          width: 50.0,
+                          fit: BoxFit.contain,
+                        ),
+                        title: Text(peliculas[i].title),
+                        subtitle: Text(peliculas[i].originalTitle),
+                        onTap: () {
+                          SystemChannels.textInput
+                              .invokeMethod('TextInput.hide');
+                          close(context, null);
+                          peliculas[i].idTarjeta = '';
+
+                          Navigator.pushNamed(context, 'peliculaDetalle',
+                              arguments: {"pelicula": peliculas[i]});
+                        },
+                      );
+                    },
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          )
+        ],
+      );
+      return peliculaLista;
+    }
   }
 
   /*   @override
