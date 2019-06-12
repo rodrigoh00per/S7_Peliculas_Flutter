@@ -15,6 +15,7 @@ class Peliculas {
 }
 
 class Pelicula {
+  String idTarjeta;
   int voteCount;
   int id;
   bool video;
@@ -68,6 +69,14 @@ class Pelicula {
       return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1v-bDpC2EHQvL68Xt9NYMZpyjB8BYgvdDszOeAB-MZGAtJY5O5g";
     } else {
       return "https://image.tmdb.org/t/p/w500/$posterPath";
+    }
+  }
+
+  getBackground() {
+    if (this.posterPath == null) {
+      return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1v-bDpC2EHQvL68Xt9NYMZpyjB8BYgvdDszOeAB-MZGAtJY5O5g";
+    } else {
+      return "https://image.tmdb.org/t/p/w500/$backdropPath";
     }
   }
 }

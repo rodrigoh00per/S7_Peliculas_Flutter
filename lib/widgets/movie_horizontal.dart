@@ -38,16 +38,20 @@ class MovieHorizontal extends StatelessWidget {
   }
 
   Widget _tarjeta(BuildContext context, Pelicula pelicula) {
-    return Container(
+    pelicula.idTarjeta = "${pelicula.id}-Tarjetita";
+    final _tarjeta = Container(
       child: Column(
         children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: FadeInImage(
-              fit: BoxFit.cover,
-              height: 160.0,
-              placeholder: AssetImage("assets/img/no-image.jpg"),
-              image: NetworkImage(pelicula.getImage()),
+          Hero(
+            tag: pelicula.idTarjeta,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: FadeInImage(
+                fit: BoxFit.cover,
+                height: 160.0,
+                placeholder: AssetImage("assets/img/no-image.jpg"),
+                image: NetworkImage(pelicula.getImage()),
+              ),
             ),
           ),
           Text(
@@ -58,5 +62,41 @@ class MovieHorizontal extends StatelessWidget {
         ],
       ),
     );
+
+    return GestureDetector(
+      child: _tarjeta,
+      onTap: () {
+        Navigator.pushNamed(context, "peliculaDetalle",
+            arguments: <String, dynamic>{
+              "pelicula": pelicula,
+              "valor_prueba": "1"
+            });
+      },
+    );
   }
+
+  /* List<Widget> _mostrarTarjetas(BuildContext context) {
+    return this.peliculas.map((pelicula) {
+      return Container(
+        child: Column(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: FadeInImage(
+                fit: BoxFit.cover,
+                height: 160.0,
+                placeholder: AssetImage("assets/img/no-image.jpg"),
+                image: NetworkImage(pelicula.getImage()),
+              ),
+            ),
+            Text(
+              pelicula.title,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.caption,
+            )
+          ],
+        ),
+      );
+    }).toList();
+  } */
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:s7_peliculas/models/actores_model.dart';
 
 import 'package:s7_peliculas/models/pelicula_model.dart';
 
@@ -41,7 +42,7 @@ class PeliculasProvider {
   Future<List<Pelicula>> getEnCines() async {
     final _url = Uri.https(this._url, "3/movie/now_playing",
         {"api_key": this._apikey, "language": this._language});
-    return this._procesarRespuesta(_url);
+    return await this._procesarRespuesta(_url);
   }
 
   Future<List<Pelicula>> getPopulares() async {
@@ -69,4 +70,25 @@ class PeliculasProvider {
 
     return resp;
   }
+//regresar lo que es la parte de los actores
+
+  Future<List<Actor>> getCast(String idPeli) async {
+    final _url = Uri.https(this._url, "3/movie/$idPeli/credits",
+        {"api_key": this._apikey, "language": this._language});
+
+    final resp = await http.get(_url);
+
+    final respDecoded = json.decode(resp.body);
+
+    final cast = Cast.fromJSONlist(respDecoded["cast"]);
+
+    return cast.actores;
+  }
+
+  Future<List<Pelicula>> buscarPelicula(String query) async {
+    final _url = Uri.https(this._url, "3/search/movie",
+        {"api_key": this._apikey, "language": this._language, "query": query});
+    return await this._procesarRespuesta(_url);
+  }
+  //busqueda de la peliculas
 }

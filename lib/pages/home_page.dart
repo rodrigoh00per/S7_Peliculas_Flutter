@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:s7_peliculas/providers/pelicula_provider.dart';
+import 'package:s7_peliculas/search/search_delegate.dart';
 import 'package:s7_peliculas/widgets/card_swiper_widget.dart';
 import 'package:s7_peliculas/widgets/movie_horizontal.dart';
 
@@ -15,11 +16,18 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           centerTitle: false,
           backgroundColor: Colors.indigoAccent,
-          title: Text("Peliculas en cines"),
+          title: Row(children: [
+            Icon(Icons.movie),
+            SizedBox(width: 10),
+            Text("Peliculas en cines")
+          ]),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () {
+                //ESTE ES EL METODO QUE OFRECE FLUTTER PARA LAS BUSQUEDAS DE INFO
+                showSearch(context: context, delegate: DataSearch());
+              },
             )
           ],
         ),
@@ -66,7 +74,7 @@ class HomePage extends StatelessWidget {
             height: 5.0,
           ),
           StreamBuilder(
-            stream: this._peliculasProvider.popularesStream ,
+            stream: this._peliculasProvider.popularesStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
                 return MovieHorizontal(
